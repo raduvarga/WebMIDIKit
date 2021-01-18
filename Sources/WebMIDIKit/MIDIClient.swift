@@ -45,8 +45,10 @@ internal final class MIDIClient : Equatable, Comparable, Hashable {
 @inline(__always) fileprivate
 func MIDIClientCreate(callback: @escaping (MIDIObjectAddRemoveNotification) -> ()) -> MIDIClientRef {
     var ref = MIDIClientRef()
-    OSAssert(MIDIClientCreateWithBlock("WebMIDIKit" as CFString, &ref) {
-        _ = MIDIObjectAddRemoveNotification(ptr: $0).map(callback)
-    })
+    if #available(OSX 10.11, *) {
+        OSAssert(MIDIClientCreateWithBlock("WebMIDIKit" as CFString, &ref) {
+            _ = MIDIObjectAddRemoveNotification(ptr: $0).map(callback)
+        })
+    }
     return ref
 }
