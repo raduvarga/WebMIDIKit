@@ -63,9 +63,9 @@ public class MIDIPort {
             case .input:
                 let `self` = self as! MIDIInput
                 ref = MIDIInputPortCreate(ref: client.ref) { event in
-                    MIDIAccess.queue.async {
+//                    MIDIAccess.queue.async {
                         `self`.onMIDIMessage?(event)
-                    }
+//                    }
                 }
 
                 MIDIPortConnectSource(ref, endpoint.ref, nil)
@@ -153,7 +153,9 @@ func MIDIInputPortCreate(ref: MIDIClientRef, readmidi: MidiReadEvent?) -> MIDIPo
 //        MIDIAccess.queue.async {
             guard readmidi != nil else { return }
             
-            lst.pointee.forEach(readmidi!)
+            lst.pointee.forEach {
+                readmidi!($0)
+            }
 //        }
     }
     return port
@@ -166,7 +168,7 @@ func MIDIDestinationCreate(clientRef: MIDIClientRef, name: String, readmidi: Mid
         
 //        MIDIAccess.queue.async {
             guard readmidi != nil else { return }
-            
+
             lst.pointee.forEach(readmidi!)
 //        }
     }

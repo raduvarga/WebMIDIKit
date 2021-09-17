@@ -79,7 +79,7 @@ extension Data {
 
 extension MIDIEvent {
     @inline(__always)
-    fileprivate init(packet p: inout MIDIPacket) {
+    init(packet p: inout MIDIPacket) {
         timestamp = p.timeStamp
         data = .init(packet: &p)
     }
@@ -87,17 +87,82 @@ extension MIDIEvent {
 
 extension MIDIPacketList: Sequence {
     public typealias Element = MIDIEvent
-
+    
     public func makeIterator() -> AnyIterator<Element> {
         var p: MIDIPacket = packet
         var i = (0..<numPackets).makeIterator()
-
+        var index = 0
+        
         return AnyIterator {
             defer {
-                p = withUnsafePointer(to: &p) { MIDIPacketNext($0).pointee }
+                if (index < numPackets) {
+                    p = withUnsafePointer(to: &p) { MIDIPacketNext($0).pointee }
+                    index += 1
+                }
             }
-
-            return i.next().map { _ in .init(packet: &p) }
+            
+            return index < numPackets ? i.next().map { _ in MIDIEvent.init(packet: &p) } : nil
         }
+    }
+}
+
+//extension MIDIPacketList: Sequence {
+//    public typealias Element = MIDIEvent
+//
+//    public func makeIterator() -> AnyIterator<Element> {
+//        var p: MIDIPacket = packet
+//        var i = (0..<numPackets).makeIterator()
+//
+//        return AnyIterator {
+//            defer {
+//                p = withUnsafePointer(to: &p) { MIDIPacketNext($0).pointee }
+//            }
+//
+//            return i.next().map { _ in .init(packet: &p) }
+//        }
+//    }
+//}
+
+
+//extension MIDIPacketList: Sequence {
+//    public typealias Element = MIDIEvent
+//    
+//    public func makeIterator() -> AnyIterator<Element> {
+//        var p: MIDIPacket = packet
+//        print("-------")
+//        print("timestamp = " + String(p.timeStamp), ",numPackets = " + String(numPackets), ",length = " + String(p.length))
+//        var i = (0..<numPackets).makeIterator()
+//        var index = 0
+//        
+//        print("return: AnyIterator")
+//        return AnyIterator {
+//            defer {
+//                if (index < numPackets) {
+//                    print("MIDIPacketNext")
+//                    p = withUnsafePointer(to: &p) { MIDIPacketNext($0).pointee }
+//                    
+//                    index += 1
+//                }
+//            }
+//            
+//            if index < numPackets {
+//                let result = i.next().map { _ in MIDIEvent.init(packet: &p) }
+//                print("return: " + String(index) + " , " + String(p.timeStamp))
+//                return result
+//            } else {
+//                print("return: nil")
+//                return nil
+//            }
+//        }
+//    }
+//}
+
+extension UnsafePointer {
+    func loadUnaligned<T>(as: T.Type, count: Int) -> [T] {
+        assert(_isPOD(T.self)) // relies on the type being POD (no refcounting or other management)
+        let buffer = UnsafeMutablePointer<T>.allocate(capacity: count)
+        defer { buffer.deallocate() }
+        memcpy(buffer, self, MemoryLayout<T>.size * count)
+        return (0..<count).map({ index in buffer.advanced(by: index).pointee })
     }
 }

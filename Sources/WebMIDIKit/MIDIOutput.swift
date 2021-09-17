@@ -28,9 +28,9 @@ public final class MIDIOutput : MIDIPort {
 class VirtualMIDIDestination: VirtualMIDIEndpoint {
     init(client: MIDIClient, name: String, readmidi: MidiReadEvent?) {
         let dest = MIDIDestinationCreate(clientRef: client.ref, name: name) { event in
-            MIDIAccess.queue.async {
+//            MIDIAccess.queue.async {
                 readmidi?(event)
-            }
+//            }
         }
         super.init(ref: dest)
     }
