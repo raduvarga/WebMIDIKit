@@ -26,7 +26,7 @@ public final class MIDIAccess {
 
         self.inputs = MIDIInputMap(client: _client)
         self.outputs = MIDIOutputMap(client: _client)
-//
+
         self._observer = NotificationCenter.default.observeMIDIEndpoints {
             self._notification(event: $0).map {
                 self.onStateChange?($0)
@@ -51,8 +51,6 @@ public final class MIDIAccess {
     private func findMidiEndpoint(event: MIDIObjectAddRemoveNotification) -> MIDIEndpoint {
         switch event.childType {
             case .source:
-//                print("event.child = " + event.child.description)
-                
                 for input in inputs {
                     let midiInput = input.1
                     if midiInput.endpoint.ref == event.child {
