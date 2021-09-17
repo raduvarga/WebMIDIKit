@@ -153,9 +153,7 @@ func MIDIInputPortCreate(ref: MIDIClientRef, readmidi: MidiReadEvent?) -> MIDIPo
 //        MIDIAccess.queue.async {
             guard readmidi != nil else { return }
             
-            lst.pointee.forEach {
-                readmidi!($0)
-            }
+            lst.pointee.forEach(readmidi!)
 //        }
     }
     return port
