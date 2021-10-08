@@ -60,7 +60,7 @@ extension MIDIPacket {
         length = UInt16(d.count)
 
         /// write out bytes to data
-        withUnsafeMutableBytes(of: &self.data) {
+        withUnsafeMutableBytes(of:  &self.data) {
             d.copyBytes(to: .init(ptr: $0), count: d.count)
         }
 
@@ -72,7 +72,8 @@ extension Data {
     @inline(__always)
     init(packet p: inout MIDIPacket) {
         self = Swift.withUnsafeBytes(of: &p.data) {
-            .init(bytes: $0.baseAddress!, count: Int(p.length))
+//            print("DataData len = " + String(p.length))
+            return .init(bytes: $0.baseAddress!, count: Int(p.length))
         }
     }
 }
@@ -87,21 +88,25 @@ extension MIDIEvent {
 
 extension MIDIPacketList: Sequence {
     public typealias Element = MIDIEvent
-    
+
     public func makeIterator() -> AnyIterator<Element> {
         var p: MIDIPacket = packet
-        var i = (0..<numPackets).makeIterator()
-        var index = 0
-        
+        var idx: UInt32 = 0
+//        print("-------------")
+//        print("numPackets = " +  String(numPackets), "len = " + String(packet.length) + ", time = " + String(packet.timeStamp))
+
         return AnyIterator {
-            defer {
-                if (index < numPackets) {
-                    p = withUnsafePointer(to: &p) { MIDIPacketNext($0).pointee }
-                    index += 1
-                }
+            // a larger length value than 256 is an invalid packet
+            guard idx < self.numPackets && p.length <= 256 else {
+                return nil
             }
-            
-            return index < numPackets ? i.next().map { _ in MIDIEvent.init(packet: &p) } : nil
+//            print("idx = " + String(idx) + ", len = " + String(p.length) + ", time = " + String(packet.timeStamp))
+            defer {
+                p = withUnsafePointer(to: &p) { MIDIPacketNext($0).pointee }
+                idx += 1
+//                print("MIDIPacketNext idx = " + String(idx) + ", len = " + String(p.length))
+            }
+            return MIDIEvent.init(packet: &p)
         }
     }
 }

@@ -63,9 +63,9 @@ public class MIDIPort {
             case .input:
                 let `self` = self as! MIDIInput
                 ref = MIDIInputPortCreate(ref: client.ref) { event in
-//                    MIDIAccess.queue.async {
+                    MIDIAccess.queue.async {
                         `self`.onMIDIMessage?(event)
-//                    }
+                    }
                 }
 
                 MIDIPortConnectSource(ref, endpoint.ref, nil)
@@ -100,6 +100,7 @@ public class MIDIPort {
             case .input:
                 MIDIPortDisconnectSource(ref, endpoint.ref)
             case .output:
+                MIDIPortDisconnectSource(ref, endpoint.ref)
                 endpoint.flush()
             default:
                 break
@@ -112,6 +113,7 @@ public class MIDIPort {
     }
     
     public func closeVirtual() {
+        close()
         MIDIPortDispose(endpoint.ref)
     }
 }
