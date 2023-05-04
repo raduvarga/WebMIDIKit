@@ -11,11 +11,13 @@ import CoreMIDI
 public class MIDIPort {
 
     public final var id: Int
+    public final var type: MIDIPortType
     public final var manufacturer: String
     public final var name: String
     public final var displayName: String
-    public final var type: MIDIPortType
     public final var version: Int
+    public final var virtual: Bool
+    public final var parentType: MIDIObjectType?
     
     internal private(set) final var ref: MIDIPortRef
     internal private(set) final weak var client: MIDIClient!
@@ -26,12 +28,24 @@ public class MIDIPort {
         self.client = client
         self.endpoint = endpoint
         self.id = endpoint.id
+        self.type = endpoint.type
         self.manufacturer = endpoint.manufacturer
         self.name = endpoint.name
         self.displayName = endpoint.displayName
-        self.type = endpoint.type
         self.version = endpoint.version
+        self.virtual = endpoint.virtual
+        self.parentType = endpoint.parentType
         self.ref = 0
+    }
+    
+    public func toStr() -> String {
+        var str = ""
+        
+        let parentTypeStr = parentType != nil ? "\(String(describing: parentType))" : "null"
+        
+        str = "\(type.description) | \(displayName) | \(name) | \(manufacturer) | \(id) | \(parentTypeStr) | \(virtual)"
+        
+        return str
     }
     
     public func getDeviceId() -> String {
@@ -45,10 +59,6 @@ public class MIDIPort {
 
     public final var state: MIDIPortDeviceState {
         return closed ? .disconnected : endpoint.state
-    }
-    
-    public final var virtual: Bool {
-        return endpoint.virtual
     }
 
     /// gets called when the port state changes (open/closed are called,

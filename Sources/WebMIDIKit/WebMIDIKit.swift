@@ -51,15 +51,15 @@ public final class MIDIAccess {
     private func findMidiEndpoint(event: MIDIObjectAddRemoveNotification) -> MIDIEndpoint {
         switch event.childType {
             case .source:
-                for input in inputs {
-                    let midiInput = input.1
+                for input in inputs.enumerated() {
+                    let midiInput = input.element.1
                     if midiInput.endpoint.ref == event.child {
                         return midiInput.endpoint
                     }
                 }
             case .destination:
-                for output in outputs {
-                    let midiOutput = output.1
+                for output in outputs.enumerated() {
+                    let midiOutput = output.element.1
                     if midiOutput.endpoint.ref == event.child {
                         return midiOutput.endpoint
                     }
@@ -81,37 +81,37 @@ public final class MIDIAccess {
             switch (endpointType, notificationType) {
 
                 case (.input, .added):
-                    print("[MIDIAccess] input added: " + endpoint.displayName)
+//                    print("[MIDIAccess] input added: " + endpoint.displayName)
                     return inputs.add(endpoint)
 
                 case (.output, .added):
-                    print("[MIDIAccess] output added: " + endpoint.displayName)
+//                    print("[MIDIAccess] output added: " + endpoint.displayName)
                     return outputs.add(endpoint)
 
                 case (.input, .removed):
-                    print("[MIDIAccess] input removed: " + endpoint.displayName)
+//                    print("[MIDIAccess] input removed: " + endpoint.displayName)
                     return inputs.remove(endpoint).map {
                         $0.close()
                         return $0
                     }
 
                 case (.output, .removed):
-                    print("[MIDIAccess] output removed: " + endpoint.displayName)
+//                    print("[MIDIAccess] output removed: " + endpoint.displayName)
                     return outputs.remove(endpoint).map {
                         $0.close()
                         return $0
                     }
                     
                 case (.other, .added):
-                    print("_notification other added");
+//                    print("_notification other added");
                     return nil
                     
                 case (.other, .removed):
-                    print("_notification other removed");
+//                    print("_notification other removed");
                     return nil
                     
                 default:
-                    print("_notification default");
+//                    print("_notification default");
                     return nil
             }
 //        }

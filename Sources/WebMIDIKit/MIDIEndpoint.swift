@@ -21,6 +21,7 @@ internal class MIDIEndpoint {
     final var displayName: String
     final var version: Int
     final var virtual: Bool
+    final var parentType: MIDIObjectType?
 
     init(ref: MIDIEndpointRef, parentType: MIDIObjectType? = nil) {
         self.ref = ref
@@ -31,7 +32,9 @@ internal class MIDIEndpoint {
         self.displayName = MIDIEndpoint[ref, string: kMIDIPropertyDisplayName]
         self.version = MIDIEndpoint[ref, int: kMIDIPropertyDriverVersion]
         self.name = MIDIEndpoint[ref, string: kMIDIPropertyName]
-        self.virtual = parentType == nil ? manufacturer == "" : parentType == .other
+        self.parentType = parentType
+        self.virtual = manufacturer.isEmpty
+                    || name == "Keyboard Maestro"
     }
 
     convenience init(notification n: MIDIObjectAddRemoveNotification) {
