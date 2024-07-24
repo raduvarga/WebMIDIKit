@@ -34,7 +34,8 @@ internal class MIDIEndpoint {
         self.name = MIDIEndpoint[ref, string: kMIDIPropertyName]
         self.parentType = parentType
         self.virtual = manufacturer.isEmpty
-                    || name == "Keyboard Maestro"
+                    || name.contains("Keyboard Maestro")
+                    || name.contains("Akai Network")
     }
 
     convenience init(notification n: MIDIObjectAddRemoveNotification) {
