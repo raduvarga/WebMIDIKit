@@ -12,9 +12,11 @@ public class MIDIPort {
 
     public final var id: Int
     public final var type: MIDIPortType
-    public final var manufacturer: String
     public final var name: String
     public final var displayName: String
+    public final var manufacturer: String
+    public final var model: String
+    public final var driver: String
     public final var version: Int
     public final var virtual: Bool
     public final var parentType: MIDIObjectType?
@@ -29,9 +31,11 @@ public class MIDIPort {
         self.endpoint = endpoint
         self.id = endpoint.id
         self.type = endpoint.type
-        self.manufacturer = endpoint.manufacturer
         self.name = endpoint.name
         self.displayName = endpoint.displayName
+        self.manufacturer = endpoint.manufacturer
+        self.model = endpoint.model
+        self.driver = endpoint.driver
         self.version = endpoint.version
         self.virtual = endpoint.virtual
         self.parentType = endpoint.parentType
@@ -41,9 +45,9 @@ public class MIDIPort {
     public func toStr() -> String {
         var str = ""
         
-        let parentTypeStr = parentType != nil ? "\(String(describing: parentType))" : "null"
+//        let parentTypeStr = parentType != nil ? "\(String(describing: parentType))" : "null"
         
-        str = "\(type.description) | \(displayName) | \(name) | \(manufacturer) | \(id) | \(parentTypeStr) | \(virtual)"
+        str = "\(type.description) | \(displayName) | \(name) | \(manufacturer) | \(model) | \(driver) | \(id) | \(virtual)"
         
         return str
     }

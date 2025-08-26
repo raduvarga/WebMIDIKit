@@ -16,9 +16,11 @@ internal class MIDIEndpoint {
     final let ref: MIDIEndpointRef
     final var id: Int
     final var type: MIDIPortType
-    final var manufacturer: String
     final var name: String
     final var displayName: String
+    final var manufacturer: String
+    final var model: String
+    final var driver: String
     final var version: Int
     final var virtual: Bool
     final var parentType: MIDIObjectType?
@@ -28,14 +30,33 @@ internal class MIDIEndpoint {
         self.id = MIDIEndpoint[ref, int: kMIDIPropertyUniqueID]
         self.type = MIDIPortType(MIDIObjectGetType(id: id))
         self.manufacturer = MIDIEndpoint[ref, string: kMIDIPropertyManufacturer]
+        self.model = MIDIEndpoint[ref, string: kMIDIPropertyModel]
+        self.driver = MIDIEndpoint[ref, string: kMIDIPropertyDriverOwner]
         self.name = MIDIEndpoint[ref, string: kMIDIPropertyName]
         self.displayName = MIDIEndpoint[ref, string: kMIDIPropertyDisplayName]
         self.version = MIDIEndpoint[ref, int: kMIDIPropertyDriverVersion]
         self.name = MIDIEndpoint[ref, string: kMIDIPropertyName]
         self.parentType = parentType
-        self.virtual = manufacturer.isEmpty
-                    || name.contains("Keyboard Maestro")
-                    || name.contains("Akai Network")
+        
+        let virtualMatch = manufacturer.isEmpty
+                        || driver == "com.apple.AppleMIDIRTPDriver"
+                        || driver == "com.apple.AppleMIDIIACDriver"
+                        || model.contains("ipMIDI")
+                        || model.contains("Bome MIDI Translator")
+                        || name.contains("ipMIDI")
+                        || name.contains("Bome MIDI Translator")
+                        || name.contains("MidiPipe")
+                        || name.contains("Keyboard Maestro")
+                        || name.contains("Akai Network")
+                        || name.contains("TouchOSC")
+                        || name.contains("Lemur")
+                        || name.contains("Audio Hijack")
+                        || name.contains("Karabiner")
+        
+        let physicalMatch = driver == "com.apple.AppleMIDIUSBDriver" ||
+                            (name.contains("Maschine") && name.contains("MK"));
+        
+        self.virtual = virtualMatch && !physicalMatch
     }
 
     convenience init(notification n: MIDIObjectAddRemoveNotification) {
@@ -98,6 +119,13 @@ func MIDIObjectGetType(id: Int) -> MIDIObjectType {
     MIDIObjectFindByUniqueID(MIDIUniqueID(id), &ref, &type)
     
     return type
+}
+
+@inline(__always) fileprivate
+func MIDIEndpointHasEntity(_ ref: MIDIEndpointRef) -> Bool {
+    var entity: MIDIEntityRef = 0
+    let status = MIDIEndpointGetEntity(ref, &entity)
+    return status == noErr && entity != 0
 }
 
 internal class VirtualMIDIEndpoint: MIDIEndpoint {
