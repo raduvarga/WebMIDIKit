@@ -34,12 +34,12 @@ public final class MIDIAccess {
         }
     }
     
-    func addVirtualInput(name: String) -> MIDIInput {
-        return MIDIInput(virtual: self._client, name: name)
+    func addVirtualInput(name: String, id: Int?) -> MIDIInput {
+        return MIDIInput(virtual: self._client, name: name, id: id)
     }
     
-    func addVirtualOutput(name: String, onMidiMessage: MidiReadEvent? = nil) -> MIDIOutput {
-        let output = MIDIOutput(virtual: self._client, name: name, readmidi: onMidiMessage)
+    func addVirtualOutput(name: String, id: Int?, onMidiMessage: MidiReadEvent? = nil) -> MIDIOutput {
+        let output = MIDIOutput(virtual: self._client, name: name, id: id, readmidi: onMidiMessage)
         
         return output
     }

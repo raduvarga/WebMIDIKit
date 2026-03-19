@@ -17,8 +17,8 @@ public final class MIDIInput : MIDIPort {
         }
     }
 
-    convenience internal init(virtual client: MIDIClient, name: String) {
-        let endpoint = VirtualMIDISource(client: client, name: name)
+    convenience internal init(virtual client: MIDIClient, name: String, id: Int?) {
+        let endpoint = VirtualMIDISource(client: client, name: name, id: id)
         self.init(client: client, endpoint: endpoint)
         open()
       }
@@ -27,7 +27,7 @@ public final class MIDIInput : MIDIPort {
 
 /// source != input, source is a hw (or virtual) port, input is connected port
 class VirtualMIDISource: VirtualMIDIEndpoint {
-    init(client: MIDIClient, name: String) {
-        super.init(ref: MIDISourceCreate(clientRef: client.ref, name: name))
+    init(client: MIDIClient, name: String, id: Int?) {
+        super.init(ref: MIDISourceCreate(clientRef: client.ref, name: name, id: id))
     }
 }

@@ -16,8 +16,8 @@ public final class MIDIOutput : MIDIPort {
     
 //    public var onMIDIMessage: ((MIDIEvent) -> ())? = nil
 
-    internal convenience init(virtual client: MIDIClient, name: String, readmidi: MidiReadEvent?) {
-        let endpoint = VirtualMIDIDestination(client: client, name: name, readmidi: readmidi)
+    internal convenience init(virtual client: MIDIClient, name: String, id: Int?, readmidi: MidiReadEvent?) {
+        let endpoint = VirtualMIDIDestination(client: client, name: name, id: id, readmidi: readmidi)
         self.init(client: client, endpoint: endpoint)
 //        onMIDIMessage = readmidi
         
@@ -26,8 +26,8 @@ public final class MIDIOutput : MIDIPort {
 }
 
 class VirtualMIDIDestination: VirtualMIDIEndpoint {
-    init(client: MIDIClient, name: String, readmidi: MidiReadEvent?) {
-        let dest = MIDIDestinationCreate(clientRef: client.ref, name: name, readmidi: readmidi)
+    init(client: MIDIClient, name: String, id: Int?, readmidi: MidiReadEvent?) {
+        let dest = MIDIDestinationCreate(clientRef: client.ref, name: name, id: id, readmidi: readmidi)
         super.init(ref: dest)
     }
 }

@@ -175,7 +175,7 @@ func MIDIInputPortCreate(ref: MIDIClientRef, readmidi: MidiReadEvent?) -> MIDIPo
     return port
 }
 
-func MIDIDestinationCreate(clientRef: MIDIClientRef, name: String, readmidi: MidiReadEvent?) -> MIDIEndpointRef {
+func MIDIDestinationCreate(clientRef: MIDIClientRef, name: String, id: Int?, readmidi: MidiReadEvent?) -> MIDIEndpointRef {
     var endpoint: MIDIEndpointRef = MIDIEndpointRef()
     MIDIDestinationCreateWithBlock(clientRef, name as CFString, &endpoint) {
         lst, srcconref in
@@ -186,12 +186,29 @@ func MIDIDestinationCreate(clientRef: MIDIClientRef, name: String, readmidi: Mid
             lst.pointee.forEach(readmidi!)
 //        }
     }
+    
+    if id != nil {
+        do {
+            try setUniqueID(of: endpoint, to: CoreMIDI.MIDIUniqueID(id!));
+        } catch {
+            //
+        }
+    }
+    
     return endpoint
 }
 
-func MIDISourceCreate(clientRef: MIDIClientRef, name: String) -> MIDIEndpointRef {
+func MIDISourceCreate(clientRef: MIDIClientRef, name: String, id: Int?) -> MIDIEndpointRef {
     var endpoint: MIDIEndpointRef = MIDIEndpointRef()
-    MIDISourceCreate(clientRef, name as CFString, &endpoint)
+    MIDISourceCreate(clientRef, name as CFString, &endpoint);
+    
+    if id != nil {
+        do {
+            try setUniqueID(of: endpoint, to: CoreMIDI.MIDIUniqueID(id!));
+        } catch {
+            //
+        }
+    }
     return endpoint
 }
 
