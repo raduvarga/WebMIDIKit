@@ -187,14 +187,6 @@ func MIDIDestinationCreate(clientRef: MIDIClientRef, name: String, id: Int?, rea
 //        }
     }
     
-    if id != nil {
-        do {
-            try setUniqueID(of: endpoint, to: CoreMIDI.MIDIUniqueID(id!));
-        } catch {
-            //
-        }
-    }
-    
     return endpoint
 }
 
@@ -202,13 +194,6 @@ func MIDISourceCreate(clientRef: MIDIClientRef, name: String, id: Int?) -> MIDIE
     var endpoint: MIDIEndpointRef = MIDIEndpointRef()
     MIDISourceCreate(clientRef, name as CFString, &endpoint);
     
-    if id != nil {
-        do {
-            try setUniqueID(of: endpoint, to: CoreMIDI.MIDIUniqueID(id!));
-        } catch {
-            //
-        }
-    }
     return endpoint
 }
 
